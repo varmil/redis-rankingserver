@@ -30,9 +30,9 @@
   "main": "app.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/CF0293/gamejam.git"
+    "url": "git://github.com/varmil/redis_rankingserver.git"
   },
-  "author": "CF0293",
+  "author": "AY",
   "license": "",
   "devDependencies": {
     "sails-redis": "~0.10.3",
