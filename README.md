@@ -1,3 +1,1 @@
-# gamejam
-
-a [Sails](http://sailsjs.org) application
+# Redis Ranking Server (with Redis)
