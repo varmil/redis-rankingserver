@@ -73,6 +73,7 @@ module.exports = {
   /**
    * 指定の範囲のランキングリストを取る（0 origin）
    * /score/range/0/0 だと全リストを取得
+   * TODO ランクを返す。 { name, score, rank } の配列という感じ。
    */
   getScoreRange: function (req, res) {
     var start = parseInt(req.param('start'), 10);
@@ -97,6 +98,7 @@ module.exports = {
 
   /**
    * 名前を元に、相対ランキングを取る
+   * TODO ランクを返す。 { name, score, rank } の配列という感じ。
    */
   getScoreRangeByName: function (req, res) {
     var name = req.param('name');
