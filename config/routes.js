@@ -46,9 +46,9 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  'post /score': 'ScoreController.postScore',
+  'post /score/:name': 'ScoreController.postScore',
   'get /score/:name': 'ScoreController.getScore',
   'get /score/range/:start/:num': 'ScoreController.getScoreRange',
-  'get /score/range/:name/:offset/:num': 'ScoreController.getScoreRangeName'
+  'get /score/range/:name/:higher/:lower': 'ScoreController.getScoreRangeByName'
 
 };
