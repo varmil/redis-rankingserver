@@ -5,6 +5,7 @@
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 var redisClient = require('redis').createClient();
+var logicScore = require('../logics/score');
 
 var KEY_RANKING = 'ranking';
 
@@ -37,16 +38,18 @@ module.exports = {
     var rank, score;
 
     async.parallel([
+      // Get Rank
       function(cb) {
         redisClient.zrevrank(KEY_RANKING, name, function(err, rank) {
           if (err) return cb(err);
           cb(null, rank + 1); // 0 origin To 1 origin
         });
       },
+      // Get Score
       function(cb) {
         redisClient.zscore(KEY_RANKING, name, function(err, score) {
           if (err) return cb(err);
-          cb(null, score); // score
+          cb(null, score);
         });
       }
     ], function(err, results) {
@@ -90,8 +93,11 @@ module.exports = {
         console.log('No Score :', start, num);
       }
 
+      // rankingListを整形する(Rank To 1 origin)
+      var result = logicScore.prettyRankingList(rankingList, start);
+
       return res.json({
-        rankingList: rankingList
+        rankingList: result
       });
     });
   },
@@ -105,6 +111,8 @@ module.exports = {
     var higher = parseInt(req.param('higher'), 10); // 自分より上位のランクをいくつ取るか
     var lower = parseInt(req.param('lower'), 10); // 自分より下位のランクをいくつ取るか
 
+    var start; // zrevrangeとrankingListの整形に用いる
+
     // 該当ユーザーのランクを取得後、その周辺のランキングを習得
     async.waterfall([
       function(cb) {
@@ -117,15 +125,15 @@ module.exports = {
         if (rank === null) {
           rank = 0; // rankが取れなかった場合は取り敢えず０から
         }
-        var start = rank - higher;
+        start = rank - higher;
         var end = rank + lower;
         if (start < 0) start = 0; // オフセットが不正なときは修正
         redisClient.zrevrange(KEY_RANKING, start, end, 'withscores', function(err, rankingList) {
           if (err) return cb(err);
-          cb(null, rankingList);
+          cb(null, rank, rankingList);
         });
       }
-    ], function(err, rankingList) {
+    ], function(err, rank, rankingList) {
       if (err) {
         console.log(err);
         return res.json({ error: err });
@@ -136,8 +144,11 @@ module.exports = {
         console.log('No Score :', name, higher, lower);
       }
 
+      // rankingListを整形する(Rank To 1 origin)
+      var result = logicScore.prettyRankingList(rankingList, start);
+
       return res.json({
-        rankingList: rankingList
+        rankingList: result
       });
     });
   },
